@@ -1,0 +1,16 @@
+{
+  "name": "cloud-native-peru-blog",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check:blog": "node scripts/blog-content.mjs",
+    "test:blog": "node --test tests/blog.test.mjs",
+    "test": "npm run check:blog && npm run test:blog"
+  },
+  "dependencies": {
+    "gray-matter": "4.0.3"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
