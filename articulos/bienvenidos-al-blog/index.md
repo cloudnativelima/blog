@@ -22,8 +22,8 @@ No necesitas tener todas las respuestas. Un problema que resolviste, una herrami
 
 Los artículos se escriben en **Markdown** y se envían mediante un pull request al repositorio de la comunidad.
 
-1. Copia la plantilla de `plantilla.md`.
-2. Guarda tu artículo en `articulos/tu-articulo.md`.
+1. Copia la carpeta `plantillas/articulo/`.
+2. Guarda el contenido en `articulos/tu-articulo/index.md` y sus imágenes en esa misma carpeta.
 3. Completa el título, resumen, autor, fecha y etiquetas.
 4. Abre un pull request para que el equipo lo revise.
 

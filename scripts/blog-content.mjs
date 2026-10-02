@@ -3,7 +3,7 @@ import { resolve, basename } from 'node:path';
 import matter from 'gray-matter';
 export const blogDirectory = resolve(process.cwd(), 'articulos');
 export function parseArticle(source, filename) {
-  const slug = filename.replace(/\.md$/, '');
+  const slug = filename.endsWith('/index.md') ? filename.slice(0, -9) : filename.replace(/\.md$/, '');
   const fail = message => { throw new Error(`Blog: ${filename}: ${message}`); };
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) fail('nombre de archivo inválido');
   const { data, content } = matter(source);
@@ -12,14 +12,24 @@ export function parseArticle(source, filename) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(data.date) || Number.isNaN(Date.parse(data.date)) || new Date(data.date).toISOString().slice(0,10) !== data.date) fail('date debe ser una fecha válida YYYY-MM-DD entre comillas');
   if (!['draft', 'published'].includes(data.status)) fail('status debe ser draft o published');
   if (!Array.isArray(data.tags) || !data.tags.length || data.tags.length > 6 || data.tags.some(tag => typeof tag !== 'string' || !tag.trim() || tag.length > 40)) fail('tags debe contener entre 1 y 6 textos');
+  if (data.cover !== undefined && typeof data.cover === 'string' && !data.cover.startsWith('/')) data.cover = articleAssetUrl(data.cover, slug);
   if (data.cover !== undefined && (typeof data.cover !== 'string' || !/^\/public\/blog\/[a-z0-9][a-z0-9/_-]*\.(png|jpg|jpeg|webp)$/.test(data.cover))) fail('cover debe ser una imagen local /public/blog/...');
   if (!content.trim()) fail('contenido vacío');
   if (/^#\s/m.test(content)) fail('usa encabezados desde ##; title ya crea el h1');
   return { ...(data.cover ? { cover: data.cover } : {}), slug, title: data.title.trim(), description: data.description.trim(), author: data.author.trim(), date: data.date, status: data.status, tags: data.tags, content: content.trim(), readingMinutes: Math.max(1, Math.ceil(content.trim().split(/\s+/).length / 200)) };
 }
-export async function getArticles({ includeDrafts = false } = {}) {
-  const files = (await readdir(blogDirectory)).filter(file => file.endsWith('.md'));
-  const articles = await Promise.all(files.map(async file => parseArticle(await readFile(`${blogDirectory}/${file}`, 'utf8'), file)));
+export function articleAssetUrl(url, slug) {
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) throw new Error('Blog: slug inválido');
+  if (/^(?:[a-z][a-z0-9+.-]*:|\/|#)/i.test(url)) return url;
+  const local = url.replace(/^\.\//, '');
+  if (!/^[a-z0-9][a-z0-9/_-]*\.(?:png|jpg|jpeg|webp)$/.test(local)) throw new Error(`Blog: ruta de imagen inválida: ${url}`);
+  return `/public/blog/${slug}/${local}`;
+}
+export async function getArticles({ includeDrafts = false, directory = blogDirectory } = {}) {
+  const entries = await readdir(directory, { withFileTypes: true });
+  const files = entries.flatMap(entry => entry.isDirectory() ? [`${entry.name}/index.md`] : entry.isFile() && entry.name.endsWith('.md') ? [entry.name] : []);
+  const articles = await Promise.all(files.map(async file => parseArticle(await readFile(`${directory}/${file}`, 'utf8'), file)));
+  if (new Set(articles.map(article => article.slug)).size !== articles.length) throw new Error('Blog: slug duplicado entre archivo y carpeta');
   return articles.filter(article => includeDrafts || article.status === 'published').sort((a,b) => b.date.localeCompare(a.date) || a.slug.localeCompare(b.slug));
 }
 if (process.argv[1] && basename(process.argv[1]) === 'blog-content.mjs') {

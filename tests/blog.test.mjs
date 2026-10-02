@@ -31,3 +31,35 @@ test('optional cover accepts public local images and rejects external paths', ()
  assert.equal(parseArticle(withCover, 'una-guia.md').cover, '/public/blog/una-guia/portada.webp');
  assert.throws(() => parseArticle(withCover.replace('/public/blog/una-guia/portada.webp', 'https://example.com/image.webp'), 'una-guia.md'));
 });
+
+test('folder articles use the folder slug, including relative covers', () => {
+ const article = parseArticle(source.replace('status: published', 'status: published\ncover: "./imagenes/portada.webp"'), 'una-guia/index.md');
+ assert.equal(article.slug, 'una-guia');
+ assert.equal(article.cover, '/public/blog/una-guia/imagenes/portada.webp');
+ assert.throws(() => parseArticle(source, 'una-guia/anidado/index.md'));
+});
+test('relative images stay inside their article folder', async () => {
+ const { articleAssetUrl } = await import('../scripts/blog-content.mjs');
+ assert.equal(articleAssetUrl('./imagenes/diagrama.png', 'una-guia'), '/public/blog/una-guia/imagenes/diagrama.png');
+ assert.throws(() => articleAssetUrl('../otro/diagrama.png', 'una-guia'));
+ assert.throws(() => articleAssetUrl('imagenes/%2e%2e/secreto.png', 'una-guia'));
+});
+test('reads folder articles, filters drafts and rejects duplicate or incomplete folders', async () => {
+ const { mkdtemp, mkdir, writeFile, rm } = await import('node:fs/promises');
+ const { tmpdir } = await import('node:os');
+ const { join } = await import('node:path');
+ const dir = await mkdtemp(join(tmpdir(), 'blog-folders-'));
+ try {
+  for (const slug of ['una-guia','borrador']) {
+   await mkdir(join(dir,slug));
+   await writeFile(join(dir,slug,'index.md'), slug === 'borrador' ? source.replace('published','draft') : source);
+  }
+  assert.deepEqual((await getArticles({directory:dir})).map(a=>a.slug), ['una-guia']);
+  assert.equal((await getArticles({directory:dir,includeDrafts:true})).length,2);
+  await writeFile(join(dir,'una-guia.md'),source);
+  await assert.rejects(getArticles({directory:dir}), /duplicado/);
+  await rm(join(dir,'una-guia.md'));
+  await mkdir(join(dir,'sin-indice'));
+  await assert.rejects(getArticles({directory:dir}), /ENOENT/);
+ } finally { await rm(dir,{recursive:true,force:true}); }
+});
