@@ -15,7 +15,7 @@ export function parseArticle(source, filename) {
   if (data.cover !== undefined && typeof data.cover === 'string' && !data.cover.startsWith('/')) data.cover = articleAssetUrl(data.cover, slug);
   if (data.cover !== undefined && (typeof data.cover !== 'string' || !/^\/public\/blog\/[a-z0-9][a-z0-9/_-]*\.(png|jpg|jpeg|webp)$/.test(data.cover))) fail('cover debe ser una imagen local /public/blog/...');
   if (!content.trim()) fail('contenido vacío');
-  if (/^#\s/m.test(content)) fail('usa encabezados desde ##; title ya crea el h1');
+  if (/^#\s/m.test(content.replace(/```[\s\S]*?```/g, ''))) fail('usa encabezados desde ##; title ya crea el h1');
   return { ...(data.cover ? { cover: data.cover } : {}), slug, title: data.title.trim(), description: data.description.trim(), author: data.author.trim(), date: data.date, status: data.status, tags: data.tags, content: content.trim(), readingMinutes: Math.max(1, Math.ceil(content.trim().split(/\s+/).length / 200)) };
 }
 export function articleAssetUrl(url, slug) {
