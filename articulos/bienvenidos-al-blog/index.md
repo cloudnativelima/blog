@@ -1,187 +1,171 @@
 ---
-title: "Bienvenidos al Blog de Cloud Native Perú: Guía de autor y formato"
-description: "Descubre todo lo que puedes compartir en nuestro blog: comandos de terminal, manifiestos YAML, diagramas de arquitectura, tablas y alertas. Aprende a publicar tu guía técnica paso a paso."
+title: "Escribe tu primer artículo en Cloud Native Perú"
+description: "Una guía para publicar, con ejemplos de código, avisos e imágenes que puedes reutilizar."
 author: "Equipo Cloud Native Perú"
 date: "2026-10-01"
 status: published
-tags:
-  - Comunidad
-  - Guía
-  - Cloud Native
-  - CNCF
+tags: [Comunidad, Guía]
 cover: "./imagenes/ecosistema-cloud-native.png"
 ---
-¡Te damos la bienvenida al blog oficial de **Cloud Native Perú**! Este es un espacio comunitario abierto y colaborativo pensado para compartir conocimientos, tutoriales técnicos, lecciones aprendidas en producción y experiencias con proyectos de la **Cloud Native Computing Foundation (CNCF)**.
+Comparte un problema que resolviste, un laboratorio o una idea que ayude a otras personas. Esta guía muestra cómo preparar tu artículo y cómo se verá en el blog.
 
-No necesitas ser un experto con décadas de experiencia para escribir aquí. Un problema que solucionaste en tu cluster, un laboratorio que probaste el fin de semana o una explicación amigable sobre contenedores pueden ser exactamente lo que otra persona en la comunidad necesita.
+> [!NOTE]
+> La plantilla y las instrucciones de publicación están en el [repositorio del blog](https://github.com/cloudnativelima/blog). Cada artículo reúne su texto, imágenes y ejemplos en una sola carpeta.
 
-> **💡 Propósito de esta guía:** Este artículo sirve como ejemplo vivo y manual de estilo. A continuación encontrarás todos los formatos y elementos visuales soportados para que prepares tu publicación con la mejor calidad técnica y visual.
+## 1. Prepara tu artículo
 
----
+Copia `plantillas/articulo/` a `articulos/mi-articulo/`. El nombre de la carpeta define la dirección `/blog/mi-articulo`.
 
-## 1. Comandos de terminal y salida de consola
-
-Para tutoriales y guías prácticas, los comandos de terminal son esenciales. Puedes utilizar bloques de código formateados con `bash` o `shell` para destacar comandos, argumentos y parámetros.
-
-### Inspección de recursos con kubectl
-
-```bash
-# Verificar la conexión al cluster y listar los nodos disponibles
-$ kubectl get nodes -o wide
-
-NAME                                      STATUS   ROLES    AGE   VERSION   INTERNAL-IP
-ip-10-0-1-42.sa-east-1.compute.internal   Ready    control  42d   v1.31.1   10.0.1.42
-ip-10-0-2-18.sa-east-1.compute.internal   Ready    worker   42d   v1.31.1   10.0.2.18
-ip-10-0-2-99.sa-east-1.compute.internal   Ready    worker   42d   v1.31.1   10.0.2.99
-
-# Desplegar un pod de prueba en el namespace default
-$ kubectl run cloud-native-demo --image=nginx:alpine --port=80
-pod/cloud-native-demo created
+```text
+articulos/mi-articulo/
+├── index.md
+├── imagenes/
+│   └── diagrama.png
+└── ejemplos/
+    └── hola.py
 ```
 
-### Ejecución de contenedores con Docker
-
-```bash
-# Descargar y levantar un contenedor local de prueba
-$ docker run -d --name cn-app -p 8080:80 nginx:alpine
-d8f1e4b9c2a3e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0
-
-# Inspeccionar logs en tiempo real
-$ docker logs -f cn-app
-2026/10/02 [notice] 1#1: using the "epoll" event method
-2026/10/02 [notice] 1#1: nginx/1.27.2
-2026/10/02 [notice] 1#1: start worker processes
-```
-
----
-
-## 2. Manifiestos de infraestructura y código fuente
-
-El blog soporta sintaxis limpia para formatos declarativos como **YAML**, **JSON**, **Go**, **Python** y **TypeScript**.
-
-### Manifiesto de Kubernetes (Deployment & Service)
+Las carpetas `imagenes/` y `ejemplos/` son opcionales. Empieza `index.md` con estos datos y reemplázalos por los tuyos:
 
 ```yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: cloud-native-api
-  namespace: produccion
-  labels:
-    app.kubernetes.io/name: cloud-native-api
-    app.kubernetes.io/part-of: cn-peru
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: cloud-native-api
-  template:
-    metadata:
-      labels:
-        app: cloud-native-api
-    spec:
-      containers:
-        - name: api
-          image: ghcr.io/cloudnativelima/api:v1.2.0
-          ports:
-            - containerPort: 8080
-          resources:
-            requests:
-              cpu: 100m
-              memory: 128Mi
-            limits:
-              cpu: 500m
-              memory: 512Mi
-          livenessProbe:
-            httpGet:
-              path: /healthz
-              port: 8080
-            initialDelaySeconds: 15
+---
+title: "Título de tu artículo"
+description: "Lo que aprenderá quien lea tu artículo."
+author: "Tu nombre"
+date: "2026-10-02"
+status: draft
+tags: [Comunidad]
+---
 ```
 
----
+Después escribe el contenido. Usa `##` para las secciones y `###` para los pasos; el título principal se genera automáticamente.
 
-## 3. Bloques de notas, consejos y advertencias
+> [!TIP]
+> Cuenta primero qué vas a resolver, indica los requisitos y termina mostrando cómo comprobar el resultado.
 
-Para resaltar ideas importantes o precauciones en producción, utiliza citas `>` con prefijos destacados:
+## 2. Código que se pueda copiar
 
-> **💡 Consejo para autores:** Mantén tus explicaciones orientadas a la práctica. Si explicas un concepto teórico como *eBPF* o *Service Mesh*, incluye siempre un ejemplo reproducible o diagrama que ayude a visualizarlo.
+Indica el lenguaje después de las tres comillas invertidas: `bash`, `yaml`, `python`, `json` o `text`. El bloque muestra el lenguaje y un botón **Copiar**. Conserva la indentación y separa los comandos de su salida.
 
-> **⚠️ Atención en producción:** Nunca almacenes credenciales, tokens de acceso o llaves privadas en tus manifiestos de Kubernetes o en el repositorio público. Utiliza siempre herramientas como External Secrets Operator o Sealed Secrets.
+Este ejemplo funciona con **Python 3**, sin paquetes adicionales. Guarda lo siguiente en `ejemplos/hola.py`:
 
----
+```python
+import json
 
-## 4. Imágenes, diagramas de arquitectura y figuras
+mensaje = {"comunidad": "Cloud Native Perú", "estado": "ok"}
+print(json.dumps(mensaje, ensure_ascii=False))
+```
 
-Un buen diagrama de arquitectura vale más que mil líneas de código. Las imágenes deben guardarse dentro de la carpeta `imagenes/` de tu artículo.
-
-![Diagrama del Ecosistema Cloud Native & CNCF en Perú](imagenes/ecosistema-cloud-native.png)
-
-Para incrustar una imagen local con pie explicativo:
-1. Coloca tu archivo en `articulos/tu-articulo/imagenes/diagrama.png`.
-2. Enlázala en Markdown como `![Texto descriptivo](imagenes/diagrama.png)`.
-3. El sistema optimizará y publicará la imagen de forma segura sin requerir hosting externo.
-
----
-
-## 5. Tablas comparativas
-
-Las tablas en Markdown son ideales para comparar proyectos, herramientas o métricas de rendimiento.
-
-| Proyecto CNCF | Categoría | Nivel de Madurez | Caso de Uso Principal |
-| :--- | :--- | :--- | :--- |
-| **Kubernetes** | Orquestación | Graduated | Gestión automatizada de clusters y contenedores |
-| **Prometheus** | Monitoreo | Graduated | Métricas en tiempo real y alertas de sistemas |
-| **OpenTelemetry** | Observabilidad | Incubating | Estándar unificado para traces, metrics y logs |
-| **Argo CD** | GitOps / CI-CD | Graduated | Entrega continua declarativa en Kubernetes |
-| **Cilium** | Redes & Seguridad | Graduated | Conectividad y observabilidad basada en eBPF |
-
----
-
-## 6. Lista de verificación antes de publicar
-
-Antes de enviar tu artículo a revisión mediante un Pull Request, valida los siguientes puntos:
-
-- [x] El artículo está guardado en `articulos/tu-articulo/index.md`.
-- [x] El archivo incluye el frontmatter inicial (`title`, `description`, `author`, `date`, `status: published`, `tags`).
-- [x] Los encabezados inician desde `##` (el `h1` se genera automáticamente a partir del título).
-- [x] Todos los comandos y fragmentos de código están probados y funcionan.
-- [x] Las imágenes están ubicadas dentro de `imagenes/` en formatos `.png`, `.jpg` o `.webp`.
-- [x] Los enlaces externos apuntan a documentación oficial o fuentes citadas.
-
----
-
-## 7. Cómo enviar tu artículo paso a paso
-
-Publicar en el blog es tan sencillo como abrir un Pull Request en GitHub:
+Desde la carpeta del artículo, ejecuta:
 
 ```bash
-# 1. Clona el repositorio oficial del blog
-$ git clone https://github.com/cloudnativelima/blog.git
-$ cd blog
-
-# 2. Crea una rama para tu publicación
-$ git checkout -b articulo/mi-guia-cloud-native
-
-# 3. Crea la carpeta de tu artículo usando la plantilla
-$ cp -r plantillas/articulo articulos/mi-guia-cloud-native
-
-# 4. Edita articulos/mi-guia-cloud-native/index.md con tu editor favorito
-# 5. Ejecuta las pruebas locales para verificar el formato
-$ npm test
-
-# 6. Sube los cambios y abre el Pull Request en GitHub
-$ git add articulos/mi-guia-cloud-native
-$ git commit -m "Publicar: Mi guía técnica sobre Cloud Native"
-$ git push origin articulo/mi-guia-cloud-native
+python3 ejemplos/hola.py
 ```
 
-Una vez creado el PR, el equipo de la comunidad revisará la propuesta, brindará feedback amigable y se encargará del despliegue automático a producción.
+Salida esperada:
 
----
+```text
+{"comunidad": "Cloud Native Perú", "estado": "ok"}
+```
 
-## ¡Tu experiencia importa!
+Puedes consultar el [archivo completo del ejemplo](https://github.com/cloudnativelima/blog/blob/main/articulos/bienvenidos-al-blog/ejemplos/hola.py). En tus tutoriales, incluye los requisitos, la versión usada y los pasos de limpieza cuando crees recursos.
 
-La comunidad de Cloud Native en Perú crece cuando compartimos lo que aprendemos en el camino. Ya sea tu primer artículo técnico o una guía avanzada de arquitectura, este espacio está abierto para ti.
+> [!IMPORTANT]
+> El botón copia todo el bloque. Escribe los comandos sin el prefijo `$` y deja los resultados en otro bloque para que puedan pegarse directamente.
 
-¿Tienes dudas o quieres conversar sobre una idea antes de escribir? Escríbenos a [contacto@cloud-native.pe](mailto:contacto@cloud-native.pe) o únete a nuestros encuentros de la comunidad.
+## 3. Notas, consejos y advertencias
+
+Usa los avisos de Markdown de GitHub. Se muestran con un título y color propios tanto en el repositorio como en el blog.
+
+```markdown
+> [!NOTE]
+> Información que ayuda a entender el paso.
+
+> [!TIP]
+> Una sugerencia para facilitar el trabajo.
+
+> [!IMPORTANT]
+> Un requisito necesario para continuar.
+
+> [!WARNING]
+> Explica el riesgo antes del paso que lo provoca.
+
+> [!CAUTION]
+> Señala una acción irreversible y su alcance.
+```
+
+> [!WARNING]
+> Antes de compartir una captura o configuración, revisa que no contenga contraseñas, tokens ni datos privados.
+
+> [!CAUTION]
+> Si un comando elimina recursos o datos, explica exactamente qué elimina y cómo preparar una copia antes de ejecutarlo.
+
+Una cita normal usa `>` sin marcador y conserva un estilo diferente:
+
+> Compartir lo que aprendemos ayuda a que otras personas puedan construir sobre esa experiencia.
+
+## 4. Imágenes y enlaces
+
+Guarda las imágenes en `imagenes/` usando PNG, JPG o WebP. Usa nombres en minúsculas y sin espacios.
+
+```markdown
+![Ilustración de la comunidad cloud native](./imagenes/ecosistema-cloud-native.png)
+```
+
+![Ilustración de la comunidad cloud native](./imagenes/ecosistema-cloud-native.png)
+
+El texto entre corchetes describe la imagen y aparece como pie de figura. Para una portada opcional, añade `cover: "./imagenes/portada.webp"` a los datos iniciales, solo si ese archivo existe.
+
+Enlaza archivos de `ejemplos/` mediante su URL de GitHub. Las imágenes locales se copian al sitio durante la compilación; no necesitas un servicio externo para alojarlas.
+
+## 5. Tablas y listas
+
+Una tabla breve ayuda a comparar opciones. En móvil, las tablas anchas se pueden desplazar horizontalmente.
+
+| Elemento | Cuándo usarlo |
+| --- | --- |
+| Código | Comandos, configuración o un ejemplo ejecutable |
+| Aviso | Requisitos, consejos o precauciones concretas |
+| Imagen | Diagramas, capturas y resultados visuales |
+| Enlace | Documentación oficial y archivos de apoyo |
+
+Antes de pedir una revisión, comprueba:
+
+- [ ] Reemplacé los datos de la plantilla y usé la fecha correspondiente.
+- [ ] Expliqué los requisitos y probé los pasos que propongo.
+- [ ] Separé comandos y resultados.
+- [ ] Las imágenes se ven y los enlaces funcionan.
+- [ ] No incluí credenciales ni información privada.
+- [ ] Ejecuté `npm test` en el repositorio del blog.
+
+Las pruebas automáticas validan el formato; la comprobación técnica de tu tutorial sigue siendo parte de la revisión.
+
+## 6. Envía tu propuesta
+
+Necesitas Git y Node.js 22 o posterior. Si no tienes permiso de escritura, crea primero un **fork** en GitHub y clona tu fork. Si eres colaborador, puedes clonar el repositorio de la comunidad:
+
+```bash
+git clone https://github.com/cloudnativelima/blog.git
+cd blog
+git switch -c articulo/mi-articulo
+cp -R plantillas/articulo articulos/mi-articulo
+npm ci
+```
+
+Edita `articulos/mi-articulo/index.md`, añade los archivos que necesites y conserva `status: draft` mientras se revisa. Después:
+
+```bash
+npm test
+git add articulos/mi-articulo
+git commit -m "Añadir mi artículo"
+git push -u origin articulo/mi-articulo
+```
+
+Abre un **pull request hacia `main` de `cloudnativelima/blog`**. El equipo revisa el contenido y, al aprobarlo, cambia el estado a `published` e integra el artículo.
+
+> [!IMPORTANT]
+> Integrar el artículo en GitHub no lo publica por sí solo en la web. Después se debe desplegar el repositorio `cloudnativelima/cloud-native-pe`; ese paso todavía no es automático.
+
+Para corregir un artículo publicado, conserva su carpeta y envía otro pull request. Así mantienes la misma URL.
+
+Consulta el [README del blog](https://github.com/cloudnativelima/blog#readme) para la guía de publicación y la vista previa local.

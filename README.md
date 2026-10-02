@@ -32,6 +32,14 @@ Usa la fecha correspondiente entre comillas. Empieza las secciones con `##`; el 
 
 Para imágenes: `![Descripción](./imagenes/diagrama.png)`. Usa PNG, JPG o WebP con nombres en minúsculas. La portada es opcional: añade `cover: "./imagenes/portada.webp"` a los datos solo si ese archivo existe. Los archivos de `ejemplos/` se pueden enlazar desde GitHub.
 
+## Formatos disponibles
+
+Usa bloques de código con lenguaje (`bash`, `yaml`, `python`, `json` o `text`). Separa los comandos de su salida y evita el prefijo `$`: el botón **Copiar** copia el bloque completo.
+
+Para avisos, usa `> [!NOTE]`, `> [!TIP]`, `> [!IMPORTANT]`, `> [!WARNING]` o `> [!CAUTION]`, seguido del texto en otra línea que empiece por `>`. También puedes usar tablas, listas y citas normales.
+
+Consulta el [artículo de ejemplo](articulos/bienvenidos-al-blog/index.md) y su carpeta `ejemplos/` para ver formatos reutilizables.
+
 ## 3. Sube a GitHub
 
 Puedes crear y editar los archivos desde GitHub en una rama, o un fork si no tienes permisos. Para hacerlo desde tu equipo, usa una copia del repositorio:

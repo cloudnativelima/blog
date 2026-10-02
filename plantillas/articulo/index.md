@@ -21,6 +21,13 @@ Describe los pasos y añade ejemplos cuando sean útiles.
 kubectl version --client
 ```
 
+> [!TIP]
+> Añade una sugerencia útil para seguir tu ejemplo. Elimina este aviso si no lo necesitas.
+
+## Comprobación
+
+Explica cómo verificar el resultado y separa la salida esperada de los comandos.
+
 ## Lo que aprendimos
 
 Comparte el resultado y las limitaciones de tu experiencia.
