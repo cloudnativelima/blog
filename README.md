@@ -1,71 +1,63 @@
-# Publicar en el blog
+# Publicar en el blog de Cloud Native Perú
 
-Este repositorio público contiene los artículos Markdown de Cloud Native Perú. La web y el portal se mantienen por separado en `cloudnativelima/cloud-native-pe`. La web importa este contenido al reconstruirse.
+## 1. Crea la carpeta
 
-## Estructura
+Copia `plantillas/articulo/` a `articulos/nombre-del-articulo/`:
 
 ```text
-./
-  README.md
-  plantilla.md
-  articulos/
-    mi-articulo.md
-  imagenes/
-    mi-articulo/
-      diagrama.png
+articulos/mi-articulo/
+  index.md       # Texto y datos del artículo
+  imagenes/      # Portada y diagramas, si los necesitas
+  ejemplos/      # Archivos de apoyo, opcionales
 ```
 
-## Escribir y revisar
+Usa minúsculas y guiones. La carpeta `mi-articulo` define la URL `/blog/mi-articulo`.
 
-1. Crea una rama o un fork del repositorio.
-2. Copia `plantilla.md` a `articulos/mi-articulo.md`.
-3. Usa un nombre único en minúsculas, sin tildes, con guiones. Ese nombre define la URL `/blog/mi-articulo`.
-4. Completa los metadatos YAML y escribe el contenido en Markdown.
-5. Ejecuta `npm ci` y `npm run check:blog`. Para ver tu artículo en la web local, consulta la sección de vista previa.
-6. Abre un pull request. El equipo revisa el contenido y establece `status: published` antes de integrarlo.
-7. El artículo aparece cuando se reconstruye y despliega el sitio. Integrar el archivo por sí solo no despliega esta web.
+## 2. Escribe
 
-## Metadatos obligatorios
+Edita `index.md` con el título, resumen, autor, fecha, etiquetas y texto. Mantén `status: draft` hasta la revisión.
 
-| Campo | Formato |
-| --- | --- |
-| `title` | Texto, máximo 140 caracteres |
-| `description` | Resumen, máximo 300 caracteres |
-| `author` | Nombre público, máximo 100 caracteres |
-| `date` | Fecha real `"YYYY-MM-DD"`, siempre entre comillas |
-| `status` | `draft` o `published` |
-| `tags` | Lista de entre 1 y 6 etiquetas, máximo 40 caracteres cada una |
-
-Los borradores se validan, pero no aparecen en el listado ni generan páginas públicas. Los artículos se ordenan por fecha descendente. No uses un encabezado `#`: el título ya genera el encabezado principal; comienza con `##`.
-
-## Portada opcional
-
-Añade `cover: "/public/blog/mi-articulo/portada.webp"` a los metadatos para mostrar una portada en el carrusel y listado. Si se omite, el blog usa una ilustración del sistema visual de la comunidad.
-
-## Contenido e imágenes
-
-Se admiten párrafos, enlaces, listas, citas, código con lenguaje, tablas y listas de tareas. El HTML incrustado se omite y los enlaces peligrosos se filtran. No se ejecuta JavaScript ni MDX desde los artículos.
-
-Guarda imágenes PNG, JPG o WebP con nombres en minúsculas y enlázalas con una ruta pública:
-
-```md
-![Descripción del diagrama](/public/blog/mi-articulo/diagrama.png)
+```yaml
+---
+title: "Título del artículo"
+description: "Resumen breve"
+author: "Tu nombre"
+date: "2026-10-01"
+status: draft
+tags: [Comunidad]
+---
 ```
 
-Incluye texto alternativo útil, fuentes y atribución de imágenes. Evita imágenes pesadas, datos personales y credenciales en ejemplos. El contenido debe ser original o contar con permiso de publicación.
+Usa la fecha correspondiente entre comillas. Empieza las secciones con `##`; el título ya crea el encabezado principal.
 
-## Comprobaciones
+Para imágenes: `![Descripción](./imagenes/diagrama.png)`. Usa PNG, JPG o WebP con nombres en minúsculas. La portada es opcional: añade `cover: "./imagenes/portada.webp"` a los datos solo si ese archivo existe. Los archivos de `ejemplos/` se pueden enlazar desde GitHub.
+
+## 3. Sube a GitHub
+
+Puedes crear y editar los archivos desde GitHub en una rama, o un fork si no tienes permisos. Para hacerlo desde tu equipo, usa una copia del repositorio:
 
 ```bash
-npm run check:blog
-npm run test:blog
+git switch -c articulo/mi-articulo
+cp -R plantillas/articulo articulos/mi-articulo
+# Escribe el artículo antes de continuar.
+npm ci
 npm test
+git add articulos/mi-articulo
+git commit -m "Añadir mi artículo"
+git push -u origin articulo/mi-articulo
 ```
 
-El build valida metadatos, genera las rutas y empaqueta las páginas. El Worker solo permite los slugs publicados; el sitemap incluye sus URLs.
+## 4. Envía a revisión
 
-## Vista previa en la web
+Abre un pull request hacia `main` en `cloudnativelima/blog`. GitHub valida el formato y el equipo revisa el contenido. Cuando esté aprobado, se cambia a `status: published` y se integra en `main`.
 
-En el repositorio de la web, ejecuta `npm run sync:blog` para importar la rama principal pública. Para probar una rama local de artículos, copia las carpetas `articulos/` e `imagenes/` a `blog/articulos/` y `blog/imagenes/` de la web y ejecuta `BLOG_SKIP_SYNC=1 npm run dev`. Cambia `status` a `published` en esa copia para revisar la página.
+**Después hay que desplegar la web para que aparezca publicado. Ese paso todavía no es automático.** La web está en otro repositorio: `cloudnativelima/cloud-native-pe`.
 
-Las comprobaciones de pull requests validan el formato. La integración de un PR aquí no despliega automáticamente la web; el sitio toma la versión actual cuando se reconstruye.
+Para corregir un artículo, conserva su carpeta y envía otro PR.
+
+<details>
+<summary>Vista previa local (opcional)</summary>
+
+En el repositorio de la web, copia `articulos/` a `blog/articulos/` y ejecuta `BLOG_SKIP_SYNC=1 npm run dev`. Para ver un borrador, cambia su estado a `published` únicamente en esa copia de prueba. Abre `/blog/mi-articulo`.
+
+</details>
